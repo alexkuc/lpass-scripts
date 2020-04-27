@@ -51,10 +51,7 @@ if [[ -z "$MASTER_PASSWORD" ]]; then
     exit 1
 fi
 
-if [ ! -d "${outdir}" ]; then
-  echo "${outdir} does not exist. Exiting."
-  exit 1
-fi
+if [ ! -d "$outdir" ]; then mkdir -p "$outdir"; fi
 
 if ! lpass status; then
   if [ -z "${email}" ]; then
