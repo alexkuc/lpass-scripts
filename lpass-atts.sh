@@ -7,11 +7,14 @@
 trap cleanup 0
 
 cleanup () {
-  unset LPASS_DISABLE_PINENTRY
-  unset MASTER_PASSWORD
+  if [[ -n "$LOGGED_IN" ]]; then lpass logout --force; fi
+  unset PASSWORD LPASS_DISABLE_PINENTRY LOGGED_IN
+  echo ""
 }
 
-usage() { echo "Usage: $0 [-l <email>] [-o <outdir>] [-i <id>]" 1>&2; exit 1; }
+LOGGED_IN=''
+
+usage() { echo "Usage: $0 [-o <outdir>] [-i <id>]" 1>&2; exit 1; }
 
 while getopts ":i:o:hl:" o; do
     case "${o}" in
@@ -20,9 +23,6 @@ while getopts ":i:o:hl:" o; do
             ;;
         o)
             outdir=${OPTARG}
-            ;;
-        l)
-            email=${OPTARG}
             ;;
         h)
             usage
@@ -40,23 +40,22 @@ fi
 
 command -v lpass >/dev/null 2>&1 || { echo >&2 "I require lpass but it's not installed.  Aborting."; exit 1; }
 
-echo -n Password:
+echo -n "Username: "
+read -r USERNAME
+echo -n "Password: "
 read -rs MASTER_PASSWORD
 printf "\n\n"
 
 export LPASS_DISABLE_PINENTRY=1
 
+if [[ -z "$USERNAME" ]]; then echo "Failed to supply username!" && exit 1; fi
+
 if [[ -z "$MASTER_PASSWORD" ]]; then echo "Failed to supply master password!" && exit 1; fi
 
 if [ ! -d "$outdir" ]; then mkdir -p "$outdir"; fi
 
-if ! lpass status; then
-  if [ -z "${email}" ]; then
-    echo "No login data found, Please login with -l or use lpass login before."
-    exit 1;
-  fi
-  lpass login "${email}"
-fi
+echo -e "\033[0;32mLog in\033[0m: starting."
+LOGGED_IN=$(lpass login "$USERNAME" <<<"$MASTER_PASSWORD")
 
 if [ -z "${id}" ]; then
   ids=$(lpass ls | sed -E 's/.*id:[[:space:]]([0-9]+)]/\1/')
