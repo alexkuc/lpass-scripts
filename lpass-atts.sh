@@ -46,10 +46,7 @@ printf "\n\n"
 
 export LPASS_DISABLE_PINENTRY=1
 
-if [[ -z "$MASTER_PASSWORD" ]]; then
-    echo "Failed to supply master password!"
-    exit 1
-fi
+if [[ -z "$MASTER_PASSWORD" ]]; then echo "Failed to supply master password!" && exit 1; fi
 
 if [ ! -d "$outdir" ]; then mkdir -p "$outdir"; fi
 
