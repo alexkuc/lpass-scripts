@@ -76,9 +76,9 @@ for id in ${ids}; do
   path=$(lpass show --format="%/as%/ag%an" "${id}" <<<"$MASTER_PASSWORD" | uniq | tail -1)
 
   until [  "${attcount}" -lt 1 ]; do
-    att=$(lpass show "${id}" <<<"$MASTER_PASSWORD" | grep att- | sed "${attcount}q;d" | tr -d :)
-    attid=$(echo "${att}" | awk '{print $1}')
-    attname=$(echo "${att}" | awk '{print $2}')
+    att=$(lpass show "${id}" <<<"$MASTER_PASSWORD" | grep att- | sed "${attcount}q;d")
+    attid=$(echo "$att" | cut -d ':' -f 1)
+    attname=$(echo "$att" | cut -d ':' -f 2)
 
     if [[ -z  ${attname}  ]]; then
       attname=${path#*/}
