@@ -3,31 +3,35 @@
 trap cleanup 0
 
 cleanup () {
-    unset LPASS_DISABLE_PINENTRY
-    unset MASTER_PASSWORD
+    if [[ -n "$LOGGED_IN" ]]; then lpass logout --force; fi
+    unset PASSWORD LPASS_DISABLE_PINENTRY LOGGED_IN
+    echo ""
 }
 
+LOGGED_IN=''
+
+if [[ -z "$1" ]]; then echo "Failed to supply entry name or id!" && exit 1; fi
+
+echo -n Username:
+read -r USERNAME
 echo -n Password:
-read -rs MASTER_PASSWORD
+read -rs PASSWORD
 printf "\n\n"
 
-if [[ -z "$MASTER_PASSWORD" ]]; then
-    echo "Failed to supply master password!"
-    exit 1
-fi
-
-if [[ -z "$1" ]]; then
-    echo "Failed to supply entry id!"
-    exit 1
-fi
+if [[ -z "$USERNAME" ]]; then echo "Failed to supply username!" && exit 1; fi
+if [[ -z "$PASSWORD" ]];then echo "Failed to supply password!" && exit 1; fi
 
 export LPASS_DISABLE_PINENTRY=1
 
-cmd="$(lpass show "$1" <<<"$MASTER_PASSWORD")"
+echo -e "\033[0;32mLog in\033[0m: starting."
 
-if [[ ! "$cmd" ]]; then
+LOGGED_IN=$(lpass login "$USERNAME" <<<"$PASSWORD")
+
+SHOW_ENTRY="$(lpass show "$1" <<<"$PASSWORD")"
+
+if [[ ! "$SHOW_ENTRY" ]]; then
     echo "Failed to authenticate entry $1!"
     exit 1
 else
-    echo "$cmd"
+    echo "$SHOW_ENTRY"
 fi
