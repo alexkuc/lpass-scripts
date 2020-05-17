@@ -15,6 +15,27 @@ Important points:
 - trap 0 is used to cleanup variables for *all* exits, signalled or not ([source](https://stackoverflow.com/questions/8122779/is-it-necessary-to-specify-traps-other-than-exit))
   - **!Very Important!** this applies *only* to Bash and certain implementations of ksh ([source](https://mywiki.wooledge.org/SignalTrap))
 
+```
+./lpass-show.sh <name or id>
+
+<name or id>    name or id of the entry to be shown
+                if name contains spaces use quotes, e.g. 'name with spaces'    
+```
+
+**Warning: this script is interactive and cannot be used in automatic manner as it asks for username and password via `read -r`**
+
 ## lpass-atts.sh
 
 This script is based on [this](https://github.com/lastpass/lastpass-cli/blob/master/contrib/lpass-att-export.sh) script. Unfortunately, it didn't work for me out-of-the-box (see introduction for my system versions). The part which was failing for me was the sed regex. Also, I have incorporated previous script (`lpass-show.sh`) to fully automate export of attachments from entries which require master password re-entry.
+
+```
+./lpass-atts.sh [-o outdir] [-i <id>]
+
+[-o outdir]    output directory where attachments will be saved
+               directory does not have to exist as it is created with `mkdir -p`
+               path can be either relative or absolute
+
+[-i <id>]      retrieve attachment(s) from a specific entry by id
+               argument supports only one id at a time
+```
+**Warning: this script is interactive and cannot be used in automatic manner as it asks for username and password via `read -r`**
