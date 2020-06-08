@@ -71,7 +71,7 @@ for id in ${ids}; do
   until [  "${attcount}" -lt 1 ]; do
     att=$(lpass show "${id}" <<<"$PASSWORD" | grep att- | sed "${attcount}q;d")
     attid=$(echo "$att" | cut -d ':' -f 1)
-    attname=$(echo "$att" | cut -d ':' -f 2)
+    attname=$(echo "$att" | cut -d ':' -f 2 | sed -e 's/^[[:space:]]*//')
 
     if [[ -z  ${attname}  ]]; then
       attname=${path#*/}
